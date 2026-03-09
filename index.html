@@ -1817,8 +1817,8 @@
                 const json = await res.json();
                 if (!json.success || !json.data.length) return; // keep skeleton if no data
 
-                const brandsHTML = json.data.map((b, i) => `
-                    <div class="brand-card" data-aos="zoom-in" data-aos-delay="${i * 80}">
+                const brandsHTML = json.data.map((b) => `
+                    <div class="brand-card">
                         <div class="brand-logo">
                             <div class="brand-icon">
                                 <img src="${b.logoUrl}" alt="${b.altText || b.name}" loading="lazy" />
@@ -1830,6 +1830,7 @@
 
                 // Duplicate for seamless marquee loop
                 track.innerHTML = brandsHTML + brandsHTML;
+                if (typeof AOS !== 'undefined') AOS.refresh();
             } catch (err) {
                 console.warn('Could not load brands from API:', err.message);
                 // Silently falls back to skeleton / static content
@@ -1846,12 +1847,12 @@
                 const json = await res.json();
                 if (!json.success || !json.data.length) return; // keep static if no data
 
-                grid.innerHTML = json.data.map((c, i) => `
-                    <div class="cert-card" data-aos="flip-left" data-aos-delay="${i * 100}">
+                grid.innerHTML = json.data.map((c) => `
+                    <div class="cert-card">
                         <div class="cert-badge">
                             <div class="cert-seal">
                                 ${c.logoUrl
-                                    ? `<img src="${c.logoUrl}" alt="${c.title}" style="width:60px;height:60px;object-fit:contain;" loading="lazy" />`
+                                    ? `<img src="${c.logoUrl}" alt="${c.title}" style="width:80px;height:80px;object-fit:contain;display:block;" loading="lazy" />`
                                     : (c.sealEmoji || '🏆')
                                 }
                             </div>
@@ -1861,6 +1862,7 @@
                         ${c.year ? `<div class="cert-year">${c.year}</div>` : ''}
                     </div>
                 `).join('');
+                if (typeof AOS !== 'undefined') AOS.refresh();
             } catch (err) {
                 console.warn('Could not load certifications from API:', err.message);
             }
