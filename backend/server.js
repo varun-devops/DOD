@@ -67,7 +67,26 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(async () => {
     console.log('✅ MongoDB connected');
     await seedAdmin(); // Create default admin if not exists
-    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+
+      // ── Keep-Alive Ping (prevents Render free tier from sleeping) ──────────
+      // Pings itself every 14 minutes so the server never goes idle
+      if (process.env.NODE_ENV === 'production') {
+        const SELF_URL = process.env.RENDER_EXTERNAL_URL || `https://api.dodsmarthealth.com`;
+        setInterval(() => {
+          const https = require('https');
+          const http = require('http');
+          const client = SELF_URL.startsWith('https') ? https : http;
+          client.get(`${SELF_URL}/api/health`, (res) => {
+            console.log(`⏱️  Keep-alive ping: ${res.statusCode}`);
+          }).on('error', (e) => {
+            console.log(`⚠️  Keep-alive ping failed: ${e.message}`);
+          });
+        }, 14 * 60 * 1000); // every 14 minutes
+        console.log('🔄 Keep-alive ping activated (every 14 min)');
+      }
+    });
   })
   .catch(err => {
     console.error('❌ MongoDB connection failed:', err.message);
