@@ -13,12 +13,14 @@ const app = express();
 
 // ─── CORS ──────────────────────────────────────────────────────────────────
 const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:3000',
-  'http://127.0.0.1:5500',   // Live Server (VS Code)
+  'https://dodsmarthealth.com',
+  'https://www.dodsmarthealth.com',
+  process.env.FRONTEND_URL,
+  'http://127.0.0.1:5500',   // VS Code Live Server
   'http://localhost:5500',
-  'https://your-netlify-site.netlify.app',   // update after deploy
-  'https://your-vercel-site.vercel.app',     // update after deploy
-];
+  'http://localhost:5000',    // Admin served from backend locally
+  'http://127.0.0.1:5000',
+].filter(Boolean);
 
 app.use(cors({
   origin: function (origin, callback) {

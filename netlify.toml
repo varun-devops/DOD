@@ -1,30 +1,31 @@
-# Netlify configuration for DOD Healthcare Static Frontend
+# Netlify deployment config for dodsmarthealth.com
 
 [build]
-  # Root of the repo is the publish directory (static site)
   publish = "."
-  # No build command needed - pure static HTML/CSS/JS
 
-# Redirect /admin to admin panel
-[[redirects]]
-  from = "/admin"
-  to = "/admin/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/admin/"
-  to = "/admin/index.html"
-  status = 200
-
-# Headers for security and CORS
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Frame-Options = "SAMEORIGIN"
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
 
-[[headers]]
-  for = "/admin/*"
-  [headers.values]
-    X-Robots-Tag = "noindex"
+# Redirect www to non-www
+[[redirects]]
+  from = "https://www.dodsmarthealth.com/*"
+  to   = "https://dodsmarthealth.com/:splat"
+  status = 301
+  force  = true
+
+# Admin panel route
+[[redirects]]
+  from = "/admin"
+  to   = "/admin/index.html"
+  status = 200
+
+# SPA fallback (keep last)
+[[redirects]]
+  from = "/*"
+  to   = "/index.html"
+  status = 200

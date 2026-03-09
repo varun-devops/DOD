@@ -1,10 +1,6 @@
-# Node
-node_modules/
-npm-debug.log*
-
-# Environment variables - NEVER commit these
-.env
-*.env.local
+# Backend secrets and dependencies
+backend/.env
+backend/node_modules/
 
 # OS files
 .DS_Store
@@ -13,11 +9,14 @@ desktop.ini
 
 # Logs
 *.log
-logs/
+npm-debug.log*
 
-# Build outputs
+# Build artifacts
 dist/
 build/
+.cache/
 
-# Editor
+# IDE
 .vscode/settings.json
+*.suo
+*.user
