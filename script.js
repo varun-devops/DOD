@@ -85,7 +85,93 @@ statNumbers.forEach(stat => {
     counterObserver.observe(stat);
 });
 
-// Slideshow section removed — no slideshow code needed.
+// ===== Slideshow Functionality =====
+const slides = document.querySelectorAll('.slide');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const slideIndicators = document.getElementById('slideIndicators');
+
+let currentSlide = 0;
+let slideInterval;
+
+// Create indicators
+slides.forEach((_, index) => {
+    const indicator = document.createElement('div');
+    indicator.classList.add('indicator');
+    if (index === 0) indicator.classList.add('active');
+    indicator.addEventListener('click', () => goToSlide(index));
+    slideIndicators.appendChild(indicator);
+});
+
+const indicators = document.querySelectorAll('.indicator');
+
+// Show slide function
+const showSlide = (index) => {
+    slides.forEach(slide => slide.classList.remove('active'));
+    indicators.forEach(indicator => indicator.classList.remove('active'));
+    
+    slides[index].classList.add('active');
+    indicators[index].classList.add('active');
+    currentSlide = index;
+};
+
+// Next slide
+const nextSlide = () => {
+    currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
+};
+
+// Previous slide
+const prevSlide = () => {
+    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+    showSlide(currentSlide);
+};
+
+// Go to specific slide
+const goToSlide = (index) => {
+    showSlide(index);
+    resetSlideInterval();
+};
+
+// Auto-play slideshow
+const startSlideshow = () => {
+    slideInterval = setInterval(nextSlide, 5000);
+};
+
+const resetSlideInterval = () => {
+    clearInterval(slideInterval);
+    startSlideshow();
+};
+
+// Event listeners for slide buttons
+nextBtn.addEventListener('click', () => {
+    nextSlide();
+    resetSlideInterval();
+});
+
+prevBtn.addEventListener('click', () => {
+    prevSlide();
+    resetSlideInterval();
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') {
+        prevSlide();
+        resetSlideInterval();
+    } else if (e.key === 'ArrowRight') {
+        nextSlide();
+        resetSlideInterval();
+    }
+});
+
+// Start slideshow
+startSlideshow();
+
+// Pause slideshow on hover
+const slideshowContainer = document.querySelector('.slideshow-container');
+slideshowContainer.addEventListener('mouseenter', () => clearInterval(slideInterval));
+slideshowContainer.addEventListener('mouseleave', startSlideshow);
 
 // ===== Scroll Animations (AOS) =====
 const observerOptions = {
@@ -435,12 +521,12 @@ const activateEasterEgg = () => {
 
 // ===== Console Message =====
 console.log('%cDOD Healthcare Kiosk', 'color: #6366f1; font-size: 24px; font-weight: bold;');
-console.log('%cBuilt with care by Amazemedics Pvt.Ltd.', 'color: #64748b; font-size: 14px;');
+console.log('%cBuilt with ❤️ by Amazemedics Pvt.Ltd.', 'color: #64748b; font-size: 14px;');
 console.log('%cWant to work with us? Contact: info@amazemedics.com', 'color: #10b981; font-size: 12px;');
 
 // ===== Initialize Everything =====
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Developed by https://webtroopsdevelopment.com/');
+    console.log('Website initialized successfully! 🚀');
     
     // Add any additional initialization here
     
@@ -469,8 +555,106 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// Gallery lightbox is now self-contained inline script in index.html
-function initGalleryView() {}
+// ===== Gallery Filtering and Lightbox =====
+function initGalleryView() {
+    const tabs = document.querySelectorAll('.gallery-tab');
+    const items = document.querySelectorAll('.gallery-item');
+    const lightbox = document.querySelector('.lightbox');
+    const lightboxImage = document.querySelector('.lightbox-image');
+    const lightboxClose = document.querySelector('.lightbox-close');
+    const lightboxPrev = document.querySelector('.lightbox-prev');
+    const lightboxNext = document.querySelector('.lightbox-next');
+    
+    if (!tabs.length || !items.length || !lightbox) return;
+    
+    let currentImageIndex = 0;
+    const galleryImages = Array.from(items);
+    
+    // Gallery filtering
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const filter = tab.getAttribute('data-filter');
+            
+            // Update active tab
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            // Filter items
+            items.forEach(item => {
+                const category = item.getAttribute('data-category');
+                if (filter === 'all' || category === filter) {
+                    item.classList.remove('hidden');
+                    item.style.animation = 'fadeInUp 0.5s ease forwards';
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        });
+    });
+    
+    // Lightbox functionality
+    items.forEach((item, index) => {
+        const viewBtn = item.querySelector('.gallery-view-btn');
+        if (viewBtn) {
+            viewBtn.addEventListener('click', () => {
+                currentImageIndex = index;
+                showLightbox(index);
+            });
+        }
+    });
+    
+    function showLightbox(index) {
+        const item = galleryImages[index];
+        const placeholder = item.querySelector('.gallery-placeholder');
+        const title = item.querySelector('.gallery-title').textContent;
+        
+        // Clone the placeholder into lightbox
+        lightboxImage.innerHTML = placeholder.innerHTML;
+        lightboxImage.style.background = placeholder.style.background;
+        
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function hideLightbox() {
+        lightbox.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    function showNextImage() {
+        const visibleImages = galleryImages.filter(item => !item.classList.contains('hidden'));
+        const currentVisibleIndex = visibleImages.indexOf(galleryImages[currentImageIndex]);
+        const nextIndex = (currentVisibleIndex + 1) % visibleImages.length;
+        currentImageIndex = galleryImages.indexOf(visibleImages[nextIndex]);
+        showLightbox(currentImageIndex);
+    }
+    
+    function showPrevImage() {
+        const visibleImages = galleryImages.filter(item => !item.classList.contains('hidden'));
+        const currentVisibleIndex = visibleImages.indexOf(galleryImages[currentImageIndex]);
+        const prevIndex = (currentVisibleIndex - 1 + visibleImages.length) % visibleImages.length;
+        currentImageIndex = galleryImages.indexOf(visibleImages[prevIndex]);
+        showLightbox(currentImageIndex);
+    }
+    
+    lightboxClose.addEventListener('click', hideLightbox);
+    lightboxPrev.addEventListener('click', showPrevImage);
+    lightboxNext.addEventListener('click', showNextImage);
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (!lightbox.classList.contains('active')) return;
+        
+        if (e.key === 'Escape') hideLightbox();
+        if (e.key === 'ArrowLeft') showPrevImage();
+        if (e.key === 'ArrowRight') showNextImage();
+    });
+    
+    // Close on background click
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) hideLightbox();
+    });
+}
 
 // ===== Specifications Tabs =====
 function initSpecifications() {
@@ -481,12 +665,19 @@ function initSpecifications() {
     
     navBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            const target = btn.getAttribute('data-spec') || btn.getAttribute('data-target');
+            const target = btn.getAttribute('data-target');
+            
+            // Update active button
             navBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+            
+            // Update active panel
             panels.forEach(panel => {
-                const match = panel.id === `spec-${target}` || panel.getAttribute('data-panel') === target || panel.id === target;
-                panel.classList.toggle('active', match);
+                if (panel.id === target) {
+                    panel.classList.add('active');
+                } else {
+                    panel.classList.remove('active');
+                }
             });
         });
     });
@@ -651,4 +842,79 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Dynamic section loading is handled by the inline script in index.html
+// ===== Dynamic Image Loading from Backend =====
+async function loadDynamicImages() {
+    // BACKEND_URL is set in index.html before this script loads
+    if (typeof BACKEND_URL === 'undefined' || BACKEND_URL.includes('your-backend-app')) {
+        console.log('Backend URL not configured. Using default images.');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${BACKEND_URL}/api/sections`);
+        if (!res.ok) return;
+        const sections = await res.json();
+
+        sections.forEach(section => {
+            if (section.images && section.images.length > 0) {
+                if (section.sectionId === 'brands') {
+                    updateBrandsSection(section.images);
+                } else if (section.sectionId === 'certifications') {
+                    updateCertificationsSection(section.images);
+                }
+            }
+        });
+    } catch (err) {
+        console.log('Backend not available. Using default content.');
+    }
+}
+
+function updateBrandsSection(images) {
+    const brandsTrack = document.querySelector('.brands-track');
+    if (!brandsTrack) return;
+
+    // Build brand cards from backend data
+    let cardsHTML = '';
+    images.forEach(img => {
+        cardsHTML += `
+            <div class="brand-card">
+                <div class="brand-logo">
+                    <div class="brand-icon"><img src="${img.imageUrl}" alt="${img.name}"></div>
+                    <h3>${img.name}</h3>
+                </div>
+            </div>
+        `;
+    });
+
+    // Duplicate for seamless marquee loop
+    brandsTrack.innerHTML = cardsHTML + cardsHTML;
+}
+
+function updateCertificationsSection(images) {
+    const certGrid = document.querySelector('.certifications-grid');
+    if (!certGrid) return;
+
+    let certHTML = '';
+    images.forEach((img, index) => {
+        certHTML += `
+            <div class="cert-card" data-aos="flip-left" data-aos-delay="${index * 100}">
+                <div class="cert-badge">
+                    <div class="cert-seal">
+                        <img src="${img.imageUrl}" alt="${img.name}" style="width:60px;height:60px;object-fit:contain;border-radius:50%;">
+                    </div>
+                </div>
+                <h3 class="cert-title">${img.name}</h3>
+            </div>
+        `;
+    });
+
+    certGrid.innerHTML = certHTML;
+
+    // Re-apply animations to new elements
+    certGrid.querySelectorAll('[data-aos]').forEach(el => {
+        animateOnScroll.observe(el);
+    });
+}
+
+// Load dynamic images when page is ready
+loadDynamicImages();
