@@ -7,6 +7,9 @@ const path = require('path');
 const authRoutes = require('./routes/auth');
 const brandsRoutes = require('./routes/brands');
 const certificationsRoutes = require('./routes/certifications');
+const galleryRoutes = require('./routes/gallery');
+const videosRoutes = require('./routes/videos');
+const mediaRoutes = require('./routes/media');
 const { seedAdmin } = require('./utils/seed');
 
 const app = express();
@@ -49,6 +52,9 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/brands', brandsRoutes);
 app.use('/api/certifications', certificationsRoutes);
+app.use('/api/gallery', galleryRoutes);
+app.use('/api/videos', videosRoutes);
+app.use('/api/media', mediaRoutes);
 
 // ─── 404 ────────────────────────────────────────────────────────────────────
 app.use((req, res) => {

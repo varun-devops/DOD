@@ -38,6 +38,21 @@ const uploadCert = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
 });
 
+// Storage for gallery images
+const galleryStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'dod-healthcare/gallery',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+    transformation: [{ width: 1200, height: 900, crop: 'limit', quality: 'auto', fetch_format: 'auto' }],
+  },
+});
+
+const uploadGallery = multer({
+  storage: galleryStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+});
+
 const deleteFromCloudinary = async (publicId) => {
   if (!publicId) return;
   try {
@@ -47,4 +62,4 @@ const deleteFromCloudinary = async (publicId) => {
   }
 };
 
-module.exports = { cloudinary, uploadBrand, uploadCert, deleteFromCloudinary };
+module.exports = { cloudinary, uploadBrand, uploadCert, uploadGallery, deleteFromCloudinary };
